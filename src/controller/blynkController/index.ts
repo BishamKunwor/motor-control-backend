@@ -1,9 +1,19 @@
-import { setSwitchStats } from "../../database/switchStats";
+// import { setSwitchStats } from "../../database/switchStats";
+
+// import moment from "moment";
 
 let timeout: any;
 
-export async function updateSwitch(status: "ON" | "OFF", time: number) {
-  setSwitchStats(status);
+export async function updateSwitch(
+  status: "ON" | "OFF",
+  time: number,
+  stats: {
+    switchStats: "ON" | "OFF";
+    time: number;
+  },
+  io: any
+) {
+  // setSwitchStats(status);
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_BLYNK_BASE_URL}/external/api/update?token=${
       process.env.NEXT_PUBLIC_BLYNK_TOKEN
@@ -15,12 +25,14 @@ export async function updateSwitch(status: "ON" | "OFF", time: number) {
     console.log("status on runned");
     timeout = setTimeout(() => {
       console.log("settimeout called");
-      setSwitchStats("OFF");
+      // setSwitchStats("OFF");
       fetch(
         `${process.env.NEXT_PUBLIC_BLYNK_BASE_URL}/external/api/update?token=${
           process.env.NEXT_PUBLIC_BLYNK_TOKEN
         }&${process.env.NEXT_PUBLIC_NODEMCU_PIN}=${0}`
       );
+      stats.switchStats = "OFF";
+      io.emit("server:status", status);
     }, time * 60000);
   } else {
     console.log("clear timout");
