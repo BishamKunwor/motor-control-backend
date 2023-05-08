@@ -1,5 +1,7 @@
 // import { setSwitchStats } from "../../database/switchStats";
 
+import axios from "axios";
+
 // import moment from "moment";
 
 let timeout: any;
@@ -14,7 +16,7 @@ export async function updateSwitch(
   io: any
 ) {
   // setSwitchStats(status);
-  const response = await fetch(
+  const response = await axios.get(
     `${process.env.NEXT_PUBLIC_BLYNK_BASE_URL}/external/api/update?token=${
       process.env.NEXT_PUBLIC_BLYNK_TOKEN
     }&${process.env.NEXT_PUBLIC_NODEMCU_PIN}=${
@@ -26,7 +28,7 @@ export async function updateSwitch(
     timeout = setTimeout(() => {
       console.log("settimeout called");
       // setSwitchStats("OFF");
-      fetch(
+      axios.get(
         `${process.env.NEXT_PUBLIC_BLYNK_BASE_URL}/external/api/update?token=${
           process.env.NEXT_PUBLIC_BLYNK_TOKEN
         }&${process.env.NEXT_PUBLIC_NODEMCU_PIN}=${0}`
@@ -40,11 +42,18 @@ export async function updateSwitch(
   }
 }
 
-export async function getBlynkActiveStatus() {
-  let response = (await fetch(
-    `${process.env.NEXT_PUBLIC_BLYNK_BASE_URL}/external/api/get?token=${process.env.NEXT_PUBLIC_BLYNK_TOKEN}&${process.env.NEXT_PUBLIC_NODEMCU_PIN}`
-  )) as any;
-  response = await response.json();
+export async function getBlynkActiveStatus(): Promise<"ON" | "OFF"> {
+  // let response = (await fetch(
+  //   `${process.env.NEXT_PUBLIC_BLYNK_BASE_URL}/external/api/get?token=${process.env.NEXT_PUBLIC_BLYNK_TOKEN}&${process.env.NEXT_PUBLIC_NODEMCU_PIN}`
+  // )) as any;
+  // response = await response.json();
 
-  return response === 1 ? "ON" : "OFF";
+  // return response === 1 ? "ON" : "OFF";
+
+  let response = await axios.get(
+    `${process.env.NEXT_PUBLIC_BLYNK_BASE_URL}/external/api/get?token=${process.env.NEXT_PUBLIC_BLYNK_TOKEN}&${process.env.NEXT_PUBLIC_NODEMCU_PIN}`
+  );
+  // console.log(response.data);
+  // return "ON";
+  return response.data === 1 ? "ON" : "OFF";
 }
